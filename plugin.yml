@@ -1,0 +1,6 @@
+name: SmOres
+main: com.bergecraft.smores.Smores
+version: 0.1
+description: manages smelting and ore behavior
+author: WildWeazel
+depends: [BergModCore]
