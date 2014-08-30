@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -89,12 +90,13 @@ public class Smores extends JavaPlugin implements Listener {
     public void onOreBreak(BlockBreakEvent e) {
         Block broken = e.getBlock();
         Material mat = getOreMaterial(broken.getType());
-        
         if(mat != null) {
             ItemStack tool = e.getPlayer().getItemInHand();
             
             if(!broken.getDrops(tool).isEmpty()) {
+                wearTool(tool);
                 dropBlockAsMaterial(broken, mat);
+                e.setCancelled(true);
             }
         }
     }
@@ -121,24 +123,32 @@ public class Smores extends JavaPlugin implements Listener {
         }
     }
     
-    @Bergification(opt="stone_gold_iron", def="true")
-    @EventHandler(ignoreCancelled=true, priority = EventPriority.HIGH)
+    @Bergification(opt="gold_as_bronze", def="true")
+    @EventHandler(ignoreCancelled=true, priority = EventPriority.NORMAL)
     public void onGoldOreBreak(BlockBreakEvent e) {
         Block broken = e.getBlock();
         Material mat = broken.getType();
-        Material tool = e.getPlayer().getItemInHand().getType();
+        ItemStack tool = e.getPlayer().getItemInHand();
+        Material toolType = tool.getType();
             
-        if((mat == Material.GOLD_ORE && (tool == Material.STONE_PICKAXE || tool == Material.GOLD_PICKAXE))
-                || ((mat == Material.IRON_ORE || mat == Material.LAPIS_ORE) && tool == Material.GOLD_PICKAXE)) {
-            dropBlockAsMaterial(broken, mat);
-        } else if (mat == Material.IRON_ORE && tool == Material.STONE_PICKAXE) {
+        if((toolType == Material.STONE_PICKAXE && mat == Material.GOLD_ORE || mat == Material.GOLD_BLOCK) || (toolType == Material.GOLD_PICKAXE && 
+                (mat == Material.IRON_ORE || mat == Material.IRON_BLOCK || mat == Material.GOLD_ORE || mat == Material.GOLD_BLOCK))) {
+            wearTool(tool);
+            broken.breakNaturally();
+            e.setCancelled(true);
+        } else if (toolType == Material.STONE_PICKAXE && 
+                (mat == Material.LAPIS_ORE || mat == Material.LAPIS_BLOCK || mat == Material.IRON_ORE || mat == Material.IRON_BLOCK)) {
+            wearTool(tool);
             dropBlockAsMaterial(broken, null);
+            e.setCancelled(true);
         }
     }
     
     private void dropBlockAsMaterial(Block b, Material m) {
         b.setType(Material.AIR);
-        b.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(m));
+        if(m != null) {
+            b.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(m));
+        }
     }
     
     private Material getOreMaterial(Material m) {
@@ -149,5 +159,11 @@ public class Smores extends JavaPlugin implements Listener {
             return m;
         }
         return null;
+    }
+    
+    private void wearTool(ItemStack tool) {
+        if(r.nextInt(tool.getEnchantmentLevel(Enchantment.DURABILITY) + 1) == 0) {
+            tool.setDurability((short) (tool.getDurability() + 1));
+        }
     }
 }
