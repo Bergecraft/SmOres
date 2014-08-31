@@ -39,7 +39,9 @@ public class Smores extends JavaPlugin implements Listener {
             Material.REDSTONE_ORE,
             Material.LAPIS_ORE,
             Material.DIAMOND_ORE,
-            Material.EMERALD_ORE);
+            Material.EMERALD_ORE,
+            Material.LOG,
+            Material.LOG_2);
     
     /**
      * Materials corresponding to an ore block
