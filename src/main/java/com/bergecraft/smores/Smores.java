@@ -66,6 +66,9 @@ public class Smores extends JavaPlugin implements Listener {
     }
       
     
+    /**
+     * Removes the ability to cook any of SMELTED_ITEMS in a furnace
+     */
     @Bergification(opt="furnace_can_smelt", def="true")
     public void removeFurnaceRecipes() {
       Iterator<Recipe> it = getServer().recipeIterator();
@@ -85,8 +88,11 @@ public class Smores extends JavaPlugin implements Listener {
       }
     }
     
+    /**
+     * If an ore is broken by a player, reproduce the break manually and drop the block type
+     */
     @Bergification(opt="ores_drop_self", def="true")
-    @EventHandler(ignoreCancelled=true, priority = EventPriority.HIGH)
+    @EventHandler(ignoreCancelled=true, priority = EventPriority.HIGHEST)
     public void onOreBreak(BlockBreakEvent e) {
         Block broken = e.getBlock();
         Material mat = getOreMaterial(broken.getType());
@@ -101,8 +107,11 @@ public class Smores extends JavaPlugin implements Listener {
         }
     }
     
+    /**
+     * If an ore is broken by an explosion, reproduce the break manually and drop the block type
+     */
     @Bergification(opt="ores_drop_self", def="true")
-    @EventHandler(ignoreCancelled=true, priority = EventPriority.HIGH)
+    @EventHandler(ignoreCancelled=true, priority = EventPriority.HIGHEST)
     public void onOreExplode(EntityExplodeEvent e) {
         Iterator<Block> it = e.blockList().iterator();
         while(it.hasNext()) {
@@ -123,34 +132,48 @@ public class Smores extends JavaPlugin implements Listener {
         }
     }
     
+    /**
+     * Treat gold as an intermediate material between stone and iron. 
+     * Stone tools break gold but not iron, while gold tools break iron lapis and gold.
+     */
     @Bergification(opt="gold_as_bronze", def="true")
-    @EventHandler(ignoreCancelled=true, priority = EventPriority.NORMAL)
+    @EventHandler(ignoreCancelled=true, priority = EventPriority.HIGH)
     public void onGoldOreBreak(BlockBreakEvent e) {
         Block broken = e.getBlock();
         Material mat = broken.getType();
         ItemStack tool = e.getPlayer().getItemInHand();
         Material toolType = tool.getType();
             
-        if((toolType == Material.STONE_PICKAXE && mat == Material.GOLD_ORE || mat == Material.GOLD_BLOCK) || (toolType == Material.GOLD_PICKAXE && 
-                (mat == Material.IRON_ORE || mat == Material.IRON_BLOCK || mat == Material.GOLD_ORE || mat == Material.GOLD_BLOCK))) {
+        if((toolType == Material.STONE_PICKAXE && mat == Material.GOLD_ORE || mat == Material.GOLD_BLOCK) 
+                || (toolType == Material.GOLD_PICKAXE && (mat == Material.LAPIS_ORE || mat == Material.LAPIS_BLOCK 
+                || mat == Material.IRON_ORE || mat == Material.IRON_BLOCK || mat == Material.GOLD_ORE || mat == Material.GOLD_BLOCK))) {
             wearTool(tool);
-            broken.breakNaturally();
+            dropBlockAsMaterial(broken, mat);
             e.setCancelled(true);
-        } else if (toolType == Material.STONE_PICKAXE && 
-                (mat == Material.LAPIS_ORE || mat == Material.LAPIS_BLOCK || mat == Material.IRON_ORE || mat == Material.IRON_BLOCK)) {
+        } else if (toolType == Material.STONE_PICKAXE && (mat == Material.IRON_ORE || mat == Material.IRON_BLOCK)) {
             wearTool(tool);
             dropBlockAsMaterial(broken, null);
             e.setCancelled(true);
         }
     }
     
+    /**
+     * Removes a block and drops a single item in its place, as if broken
+     * @param b The block to remove
+     * @param m The material to drop
+     */
     private void dropBlockAsMaterial(Block b, Material m) {
         b.setType(Material.AIR);
         if(m != null) {
             b.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(m));
+            mLog.fine("Dropped " + b + " as " + m);
         }
     }
     
+    /**
+     * @param m The material to check
+     * @return The material of an ore block, or null otherwise
+     */
     private Material getOreMaterial(Material m) {
         if(ORES.contains(m)) {
             if(m == Material.GLOWING_REDSTONE_ORE) {
@@ -161,6 +184,13 @@ public class Smores extends JavaPlugin implements Listener {
         return null;
     }
     
+    /**
+     * Modifies the durability of a tool taking Unbreaking into account,
+     * assuming the event IS CANCELED. Bukkit seems to cache and invert side effects
+     * of canceled events, so to result in the tool losing durability anyway it must 
+     * be incremented during the event handler.
+     * @param tool The tool to wear
+     */
     private void wearTool(ItemStack tool) {
         if(r.nextInt(tool.getEnchantmentLevel(Enchantment.DURABILITY) + 1) == 0) {
             tool.setDurability((short) (tool.getDurability() + 1));
