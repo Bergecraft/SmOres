@@ -16,3 +16,4 @@ Furnaces only work for food; ores, sand, logs, and clay cannot be baked/smelted 
 Gold materials are re-purposed as Copper/Bronze, an intermediary between Stone and Iron tools. Stone picks can break Gold (Copper) Ore, Gold (Bronze) picks can break Iron Ore (and Lapis), but Stone picks cannot break Iron Ore. The same logic applies to the corresponding craftable blocks. Thus the material progression is Wood, Stone, Bronze, Iron, Diamond.
 
 
+![Visualization of pick use](http://i.imgur.com/KaO2YHN.png)
