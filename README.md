@@ -17,3 +17,10 @@ Gold materials are re-purposed as Copper/Bronze, an intermediary between Stone a
 
 
 ![Visualization of pick use](http://i.imgur.com/KaO2YHN.png)
+
+##To-do
+
+* Enable live configuration
+* Add configuration for which materials are affected
+* Warn players with a text popup when attempting a blocked smelting recipe
+* Configure arbitrary pick behavior?
