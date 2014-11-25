@@ -17,12 +17,18 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.valadian.bergecraft.ABergMod;
 import com.valadian.bergecraft.annotations.Bergification;
 
-public class Smores extends JavaPlugin implements Listener {
-    
+public class Smores extends ABergMod implements Listener {
+
+	@Override
+	protected String getPluginName() {
+		return "Smores";
+	}
     /**
      * Materials that are not to be smelted in a furnace
      */
@@ -167,7 +173,13 @@ public class Smores extends JavaPlugin implements Listener {
     private void dropBlockAsMaterial(Block b, Material m) {
         b.setType(Material.AIR);
         if(m != null) {
-            b.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(m));
+        	ItemStack stack = new ItemStack(m);
+        	if(m == Material.GOLD_ORE){
+            	ItemMeta meta = stack.getItemMeta();
+            	meta.setDisplayName("Bronze Ore");
+            	stack.setItemMeta(meta);
+        	}
+            b.getWorld().dropItemNaturally(b.getLocation(), stack);
             mLog.fine("Dropped " + b + " as " + m);
         }
     }
