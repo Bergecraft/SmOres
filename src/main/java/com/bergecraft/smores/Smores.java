@@ -18,17 +18,13 @@ import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import com.valadian.bergecraft.ABergMod;
 import com.valadian.bergecraft.annotations.Bergification;
 
 public class Smores extends ABergMod implements Listener {
 
-	@Override
-	protected String getPluginName() {
-		return "Smores";
-	}
+
     /**
      * Materials that are not to be smelted in a furnace
      */
@@ -206,6 +202,10 @@ public class Smores extends ABergMod implements Listener {
      * @param tool The tool to wear
      */
     private void wearTool(ItemStack tool) {
+        if(tool.getDurability() >= tool.getType().getMaxDurability()) {
+            tool.setAmount(0);
+        }
+        
         if(r.nextInt(tool.getEnchantmentLevel(Enchantment.DURABILITY) + 1) == 0) {
             tool.setDurability((short) (tool.getDurability() + 1));
         }
