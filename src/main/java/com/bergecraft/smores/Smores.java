@@ -174,11 +174,11 @@ public class Smores extends ABergMod implements Listener {
         b.setType(Material.AIR);
         if(m != null) {
         	ItemStack stack = new ItemStack(m);
-        	if(m == Material.GOLD_ORE){
-            	ItemMeta meta = stack.getItemMeta();
-            	meta.setDisplayName("Bronze Ore");
-            	stack.setItemMeta(meta);
-        	}
+//        	if(m == Material.GOLD_ORE){
+//            	ItemMeta meta = stack.getItemMeta();
+//            	meta.setDisplayName("Bronze Ore");
+//            	stack.setItemMeta(meta);
+//        	}
             b.getWorld().dropItemNaturally(b.getLocation(), stack);
             mLog.fine("Dropped " + b + " as " + m);
         }
