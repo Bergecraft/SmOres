@@ -23,7 +23,11 @@ import com.valadian.bergecraft.ABergMod;
 import com.valadian.bergecraft.annotations.Bergification;
 
 public class Smores extends ABergMod implements Listener {
-
+	@Override
+	protected String getPluginName() {
+		// TODO Auto-generated method stub
+		return "Smores";
+	}
 
     /**
      * Materials that are not to be smelted in a furnace
